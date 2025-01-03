@@ -258,7 +258,7 @@ class SolitaireChinois:
         if solved_a_star:
             print(f"A* solved the puzzle in {a_star_time:.4f} seconds with {explored_states_a_star[0]} explored states.")
             self.reset_board()  
-            self.log_moves(solution_moves_a_star,"A*")
+            self.log_moves(solution_moves_a_star,"A_star")
         else:
             print("A* failed to solve the puzzle.")
 
