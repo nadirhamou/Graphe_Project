@@ -2,8 +2,7 @@ import time
 from heapq import heappush, heappop
 
 class SolitaireChinois:
-    def __init__(self, final_target=None):
-
+    def __init__(self):
         self.board = [
             [-1, -1, 1, 1, 1, -1, -1],
             [-1, -1, 1, 1, 1, -1, -1],
@@ -15,7 +14,7 @@ class SolitaireChinois:
         ]
 
         self.initial_empty = self.get_initial_empty_position()
-        self.final_target = final_target or self.initial_empty
+        self.final_target = self.get_final_target()
         self.board[self.initial_empty[0]][self.initial_empty[1]] = 0
         self.moves = []
 
@@ -23,12 +22,24 @@ class SolitaireChinois:
         """Prompts the user to input the initial empty position and validates it."""
         while True:
             try:
-                x, y = map(int, input("Enter the coordinates of the empty cell (x, y) between 0 and 6: ").split(","))
+                x, y = map(int, input("Enter the initial empty position (x, y) between 0 and 6: ").split(","))
                 if (
                     0 <= x < 7
                     and 0 <= y < 7
                     and self.board[x][y] == 1
                 ):
+                    return x, y
+                else:
+                    print("Invalid coordinates. Please enter valid coordinates within the playable area.")
+            except ValueError:
+                print("Invalid input. Please enter two integers separated by a comma.")
+
+    def get_final_target(self):
+        """Prompts the user to input the final target position and validates it."""
+        while True:
+            try:
+                x, y = map(int, input("Enter the final target position (x, y) between 0 and 6: ").split(","))
+                if 0 <= x < 7 and 0 <= y < 7 and self.board[x][y] == 1:
                     return x, y
                 else:
                     print("Invalid coordinates. Please enter valid coordinates within the playable area.")
@@ -107,9 +118,14 @@ class SolitaireChinois:
         return False
 
     def heuristic(self):
-        """Heuristic: Penalize more for pegs that are not in the center or are far apart."""
-        distance_from_center = sum(abs(x - 3) + abs(y - 3) for y, row in enumerate(self.board) for x, val in enumerate(row) if val == 1)
-        return sum(row.count(1) for row in self.board) + distance_from_center
+        """Heuristic function: Penalize distance of pegs from the final target."""
+        target_x, target_y = self.final_target
+        distance_sum = 0
+        for x in range(7):
+            for y in range(7):
+                if self.board[x][y] == 1:
+                    distance_sum += abs(x - target_x) + abs(y - target_y)
+        return distance_sum + sum(row.count(1) for row in self.board)
 
 
     def greedy_best_first_search(self, explored_states, solution_moves):
